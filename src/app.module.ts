@@ -3,7 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
 import postgresConfig from './config/postgres.config';
+import { VideoModule } from './video/video.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import postgresConfig from './config/postgres.config';
         return obj;
       },
     }),
+    UserModule,
+    VideoModule
   ],
   controllers: [AppController],
   providers: [AppService],
