@@ -1,0 +1,19 @@
+version: '3.1'
+
+volumes:
+  postgres_data:
+
+
+services:
+  postgres:
+    image: postgres:your_version
+    container_name: your_container_name
+    ports:
+      - 'your_host_port:your_container_port'
+    environment:
+      - POSTGRES_USER=your_user_name
+      - POSTGRES_PASSWORD=your_password
+      - POSTGRES_DB=your_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
