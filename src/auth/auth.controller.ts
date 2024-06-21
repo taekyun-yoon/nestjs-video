@@ -6,7 +6,7 @@ import { Public } from 'src/common/decorator/public.decorator';
 import { LoginResDto, SignupResDto } from './dto/res.dto';
 
 @ApiTags('Auth')
-@ApiExtraModels(SignupReqDto, LoginReqDto)
+@ApiExtraModels(SignupResDto, LoginResDto)
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
