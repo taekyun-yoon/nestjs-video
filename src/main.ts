@@ -18,6 +18,7 @@ async function bootstrap() {
     .setVersion('0.1')
     .addBearerAuth()
     .build();
+    //명시적으로 인증을 해제하기 전까지 swagger에서 변경되어도 인증 유지
     const customOptions: SwaggerCustomOptions = {
       swaggerOptions: {
         persistAuthorization: true,
@@ -26,9 +27,10 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('docs', app, document, customOptions);
 
-    //Apply ValidationPipe
+    //Apply globally ValidationPipe 
     app.useGlobalPipes(
       new ValidationPipe({
+        //Apply globally class-transform
         transform: true,
       }),
     );

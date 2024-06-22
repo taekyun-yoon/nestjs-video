@@ -4,6 +4,7 @@ import { UserRole } from '../enum/user.enum';
 
 @Entity()
 export class User {
+    //uuid: 네트워크에서 고유성이 보장되는 아이디, 개별 객체의 고유성 위해 사용
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

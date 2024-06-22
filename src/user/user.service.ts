@@ -10,6 +10,17 @@ export class UserService {
         private readonly userRepository: Repository<User>
     ){}
 
+    async findAll(page: number, size: number) {
+        const users = this.userRepository.find({ })
+        return users;
+    }
+
+    async findUser(id: string) {
+        const user = await this.userRepository.findOneBy({ id });
+        if(!user) throw new NotFoundException('No user');
+        return user;
+    }
+
     async createUser(email: string, encryptedPassword: string) {
         const user = this.userRepository.create({ email: email, password: encryptedPassword });
         await this.userRepository.save(user);
