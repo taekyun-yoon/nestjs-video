@@ -8,4 +8,7 @@ export class SignupResDto {
 export class LoginResDto {
     @ApiProperty({ required: true })
     accessToken: string;
+
+    @ApiProperty({ required: true })
+    refreshToken: string;
 }

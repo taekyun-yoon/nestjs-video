@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -8,9 +8,17 @@ import { AuthModule } from './auth/auth.module';
 import jwtConfig from './config/jwt.config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
 
 @Module({
   imports: [
+    RedisModule.forRootAsync({
+      useFactory: () => ({
+        type: 'single',
+        url: 'redis://127.0.0.1:6379',  
+      }),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [postgresConfig, jwtConfig],
@@ -54,4 +62,11 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     }
   ],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+      consumer
+        .apply(LoggingMiddleware)
+        .forRoutes('*');
+  }
+}
