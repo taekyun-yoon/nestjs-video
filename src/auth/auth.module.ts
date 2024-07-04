@@ -3,9 +3,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from 'src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Module({
   imports: [
@@ -13,9 +14,9 @@ import { JwtStrategy } from './jwt.strategy';
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
-      useFactory: async (ConfigService: ConfigService) => {
+      useFactory: async (configService: ConfigService) => {
         return {
-          secret: ConfigService.get('jwt.secret'),
+          secret: configService.get('jwt.secret'),
           signOptions: {
             expiresIn: '1d',
           },

@@ -1,14 +1,14 @@
-import { BadRequestException, Body, Controller, Post, Req, Res } from '@nestjs/common';
-import { ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Headers, Post, Req, Res } from '@nestjs/common';
+import { ApiBearerAuth, ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginReqDto, SignupReqDto } from './dto/req.dto';
 import { Public } from 'src/common/decorator/public.decorator';
-import { LoginResDto, SignupResDto } from './dto/res.dto';
+import { LoginResDto, RefreshResDto, SignupResDto } from './dto/res.dto';
 import { ApiGetResponse, ApiPostResponse } from 'src/common/decorator/swagger.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @ApiTags('Auth')
-@ApiExtraModels(SignupResDto, LoginResDto)
+@ApiExtraModels(SignupResDto, LoginResDto, RefreshResDto)
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
@@ -33,16 +33,32 @@ export class AuthController {
             const  userAgent = req['userAgent'] as string;
             const ipAddress = req['ipAddress'] as string;
 
-            console.log('userAgent: ', userAgent);
-            console.log('ipAddress: ', ipAddress);
-
             const { accessToken, refreshToken } = await this.authService.login(email, password, userAgent, ipAddress);
-
-            res.cookie('accessToken', accessToken, { httpOnly: true });
+            
+            res.cookie('refreshToken', refreshToken, { 
+                httpOnly: true, 
+                secure: false, 
+                maxAge: 7 * 24 * 60 * 60 * 1000 });
+                
             res.status(201).json({
-                message: 'Success Login',
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            })
+                'accessToken': accessToken
+            });
+    }
+
+    @Public()
+    @ApiPostResponse(RefreshResDto)
+    @Post('refresh')
+    async refresh(
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response
+    ) {req.cookies
+        const token = req.cookies['refreshToken'];
+        const { newAccessToken, newRefreshToken } = await this.authService.refresh(token);
+        
+        res.cookie('refreshToken', newRefreshToken, { 
+            httpOnly: true, 
+            secure: false, 
+            maxAge: 7 * 24 * 60 * 60 * 1000 });
+        return { accessToken: newAccessToken };
     }
 }

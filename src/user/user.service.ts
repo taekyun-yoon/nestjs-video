@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
+import { UserRole } from './enum/user.enum';
 
 @Injectable()
 export class UserService {
@@ -31,5 +32,10 @@ export class UserService {
     async findOneByEmail(email: string) {
         const user = await this.userRepository.findOneBy({ email: email});
         return user;
+    }
+
+    async checkUserIsAdmin(id: string) {
+        const user = await this.userRepository.findOneBy({ id });
+        return user.role === UserRole.Admin;
     }
 }

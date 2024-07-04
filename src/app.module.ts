@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -17,6 +18,9 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
       useFactory: () => ({
         type: 'single',
         url: 'redis://127.0.0.1:6379',  
+        options: {
+          password: process.env.REDIS_PASSWORD
+        }
       }),
     }),
     ConfigModule.forRoot({
@@ -51,7 +55,8 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
     }),
     UserModule,
     VideoModule,
-    AuthModule
+    AuthModule,
+    JwtModule
   ],
   controllers: [],
   providers: [

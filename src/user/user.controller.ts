@@ -6,6 +6,8 @@ import { FindUserReqDto } from './dto/req.dto';
 import { PageResDto } from 'src/common/dto/res.dto';
 import { UserService } from './user.service';
 import { ApiGetItemsResponse, ApiGetResponse } from 'src/common/decorator/swagger.decorator';
+import { Roles } from 'src/common/decorator/role.decorator';
+import { UserRole } from './enum/user.enum';
 
 @ApiTags('User')
 @ApiExtraModels(FindUserResDto, PageReqDto, PageResDto, FindUserReqDto)
@@ -16,6 +18,7 @@ export class UserController {
     @ApiBearerAuth()
     @ApiGetItemsResponse(FindUserResDto)
     @Get()
+    @Roles(UserRole.Admin)
     async findAll(@Query() { page, size }: PageReqDto): Promise<{ items: FindUserResDto[] }> {
         const users = await this.userService.findAll(page, size);
         return { items: users.map((user) => FindUserResDto.toDto(user)) };
