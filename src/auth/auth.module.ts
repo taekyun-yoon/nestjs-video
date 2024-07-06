@@ -1,3 +1,4 @@
+import { APP_GUARD } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -25,7 +26,10 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     }),
     ConfigModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [
+    AuthService, 
+    JwtStrategy,
+  ],
   controllers: [AuthController],
   exports: [AuthService]
 })

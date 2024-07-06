@@ -12,7 +12,10 @@ export class UserService {
     ){}
 
     async findAll(page: number, size: number) {
-        const users = this.userRepository.find({ })
+        const users = this.userRepository.find({ 
+            skip: (page - 1) * size,
+            take: size,
+        })
         return users;
     }
 

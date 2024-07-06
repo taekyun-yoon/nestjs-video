@@ -7,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { WinstonModule, utilities } from 'nest-winston';
 import * as winston from 'winston';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -49,6 +50,8 @@ async function bootstrap() {
         transform: true,
       }),
     );
+
+    app.useGlobalInterceptors(new TransformInterceptor());
 
     app.use(cookieParser());
 
