@@ -1,12 +1,27 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import { WinstonModule, utilities } from 'nest-winston';
+import * as winston from 'winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      transports: [
+          new winston.transports.Console({
+            level:process.env.STAGE === 'prod' ? 'info' : 'debug',
+            format: winston.format.combine(
+              winston.format.timestamp(),
+              utilities.format.nestLike('NestJS', { prettyPrint: true }),
+            )
+          })
+      ]
+    })
+  });
 
   const configService = app.get(ConfigService);
   app.setGlobalPrefix('api/v1');
@@ -39,7 +54,8 @@ async function bootstrap() {
 
     const port = 3000;
     await app.listen(3000);
-    console.info(`NODE_ENV: ${configService.get('NODE_ENV')}`);
-    console.info(`listening on port ${port}`);
+    Logger.log(`NODE_ENV: ${configService.get('NODE_ENV')}`);
+    Logger.log(`STAGE: ${process.env.STAGE}`);
+    Logger.log(`listening on port ${port}`);
 }
 bootstrap();

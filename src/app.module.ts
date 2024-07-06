@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -60,11 +61,12 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
   ],
   controllers: [],
   providers: [
+    Logger,
     {
       //모든 요청에 대해 전역적으로 JwtAuth 인증 수행
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
+    },
   ],
 })
 
