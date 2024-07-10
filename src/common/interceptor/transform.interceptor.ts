@@ -12,7 +12,7 @@ export class TransformInterceptor<T, R> implements NestInterceptor<T, R> {
 
                 if(Array.isArray(data)) {
                     return {
-                        items: DataTransfer,
+                        items: data,
                         page: Number(request.query['page'] || 1),
                         size: Number(request.query['size'] || 20),
                 };
