@@ -13,9 +13,15 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import swaggerConfig from './config/swagger.config';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      //max 10api per 60sec by ip
+      ttl: 60000,
+      limit: 10,
+    }]),
     RedisModule.forRootAsync({
       useFactory: () => ({
         type: 'single',
