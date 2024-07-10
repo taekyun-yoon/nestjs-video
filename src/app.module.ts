@@ -12,6 +12,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import swaggerConfig from './config/swagger.config';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [postgresConfig, jwtConfig],
+      load: [postgresConfig, jwtConfig, swaggerConfig],
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     TypeOrmModule.forRootAsync({

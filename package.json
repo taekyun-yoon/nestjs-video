@@ -37,6 +37,7 @@
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
     "express": "^4.19.2",
+    "express-basic-auth": "^1.2.1",
     "ioredis": "^5.4.1",
     "nest-winston": "^1.10.0",
     "passport": "^0.7.0",
