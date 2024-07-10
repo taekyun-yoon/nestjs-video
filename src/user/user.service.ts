@@ -41,4 +41,11 @@ export class UserService {
         const user = await this.userRepository.findOneBy({ id });
         return user.role === UserRole.Admin;
     }
+
+    async createBulk(){
+        for(let i = 0; i <= 100000; i++) {
+        await this.userRepository.save(
+            this.userRepository.create({ email: `nestjs${i}@nestjs.com`, password: 'Password1!' }))
+        }
+    }
 }

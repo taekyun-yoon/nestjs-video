@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { FindUserResDto } from './dto/res.dto';
 import { PageReqDto } from 'src/common/dto/req.dto';
@@ -8,6 +8,7 @@ import { UserService } from './user.service';
 import { ApiGetItemsResponse, ApiGetResponse } from 'src/common/decorator/swagger.decorator';
 import { Roles } from 'src/common/decorator/role.decorator';
 import { UserRole } from './enum/user.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('User')
 @ApiExtraModels(FindUserResDto, PageReqDto, PageResDto, FindUserReqDto)
@@ -30,5 +31,12 @@ export class UserController {
     async findUser(@Param() { id }: FindUserReqDto): Promise<FindUserResDto> {
         const user = await this.userService.findUser(id);
         return FindUserResDto.toDto(user);
+    }
+
+    @Public()
+    @Post('bulk')
+    createBulk() {
+        return this.userService.createBulk();
+        
     }
 }
