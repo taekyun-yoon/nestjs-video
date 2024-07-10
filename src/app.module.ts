@@ -47,7 +47,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
         if (configService.get('NODE_ENV') === 'development' || 'test') {
           obj = Object.assign(obj, {
             //엔티티 변경 사항을 자동으로 데이터베이스 스키마에 반영
-            synchronize: true,
+            // typeORM migration 사용 -> synchronize : false
+            // synchronize: true,
             logging: true,
           });
         }
