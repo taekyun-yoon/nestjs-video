@@ -2,7 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateVideoReqDto {
     @ApiProperty({ required: true})
-    id: string;
+    title: string;
+    
+    @ApiProperty({ required: true})
+    video: string;
 }
 
 export class FindVideoReqDto {

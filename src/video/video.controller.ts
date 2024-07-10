@@ -6,17 +6,28 @@ import { PageReqDto } from 'src/common/dto/req.dto';
 import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto';
 import { ThrottlerBehindProxyGuard } from 'src/common/guard/throttler-behind-proxy.guard';
 import { Throttle } from '@nestjs/throttler';
+import { CurrentUser } from 'src/common/decorator/currentUser.decorator';
+import { UserAfterAuth } from 'src/common/dto/user.dto';
+import { CreateVideoCommand } from './command/create-video.command';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateVideoResDto } from './dto/res.dto';
 
 @ApiTags('Video')
 @ApiBearerAuth()
 @UseGuards(ThrottlerBehindProxyGuard) 
 @Controller('video')
 export class VideoController {
-    constructor(private readonly videoService: VideoService){}
+    constructor(
+        private readonly videoService: VideoService,
+        private commandBus: CommandBus
+        ){}
 
     @Post()
-    upload(@Body() createVideoReqDto: CreateVideoReqDto) {
-        return this.videoService.create();
+    async upload(@Body() createVideoReqDto: CreateVideoReqDto, @CurrentUser() user: UserAfterAuth): Promise<CreateVideoResDto> {
+        const { title, video } = createVideoReqDto;
+        const command = new CreateVideoCommand(user.id, title, 'video/mp4', 'mp4', Buffer.from(''));
+        const { id } = await this.commandBus.execute(command);
+        return { id, title};
     }
 
     @Get()
