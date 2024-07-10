@@ -1,3 +1,4 @@
+import { map } from 'rxjs';
 import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiPostResponse } from 'src/common/decorator/swagger.decorator';
@@ -9,8 +10,9 @@ import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from 'src/common/decorator/currentUser.decorator';
 import { UserAfterAuth } from 'src/common/dto/user.dto';
 import { CreateVideoCommand } from './command/create-video.command';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateVideoResDto } from './dto/res.dto';
+import { FindVideosQuery } from './query/find-videos.query';
 
 @ApiTags('Video')
 @ApiBearerAuth()
@@ -19,7 +21,8 @@ import { CreateVideoResDto } from './dto/res.dto';
 export class VideoController {
     constructor(
         private readonly videoService: VideoService,
-        private commandBus: CommandBus
+        private commandBus: CommandBus,
+        private queryBus: QueryBus,
         ){}
 
     @Post()
@@ -31,8 +34,19 @@ export class VideoController {
     }
 
     @Get()
-    findAll(@Query() { page, size }: PageReqDto) {
-        return this.videoService.findAll();
+    async findAll(@Query() { page, size }: PageReqDto) {
+        const findVideosQuery = new FindVideosQuery(page, size);
+        const videos = await this.queryBus.execute(findVideosQuery);
+        return videos.map(({ id, title, user }) => {
+            return {
+                id,
+                title,
+                user: {
+                    id: user.id,
+                    email: user.email
+                },
+            };
+        });
     }
 
     @Get(':id')
