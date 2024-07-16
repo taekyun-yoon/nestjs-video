@@ -5,6 +5,8 @@ import { DataSource } from "typeorm";
 import { Video } from "./entity/video.entity";
 import { User } from "src/user/entity/user.entity";
 import { VideoCreatedEvent } from "./event/video-created.event";
+import { writeFile } from "fs/promises";
+import { join } from "path";
 
 @Injectable()
 @CommandHandler(CreateVideoCommand)
@@ -34,6 +36,8 @@ export class CreateVideoHandler implements ICommandHandler<CreateVideoCommand> {
     }
     private async uploadVideo(id: string, extension: string, buffer: Buffer) {
         console.log('upload video');
+        const filePath = join(process.cwd(), 'video-storage', `${id}.${extension}`);
+        await writeFile(filePath, buffer);
     }
 
 }
