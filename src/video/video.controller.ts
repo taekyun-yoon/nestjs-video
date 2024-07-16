@@ -1,7 +1,7 @@
 import { map } from 'rxjs';
-import { Body, Controller, Get, HttpStatus, Param, ParseFilePipeBuilder, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseFilePipeBuilder, Post, Query, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiConsumes, ApiExtraModels, ApiTags } from '@nestjs/swagger';
-import { ApiGetItemsResponse, ApiPostResponse } from 'src/common/decorator/swagger.decorator';
+import { ApiGetItemsResponse, ApiGetResponse, ApiPostResponse } from 'src/common/decorator/swagger.decorator';
 import { VideoService } from './video.service';
 import { PageReqDto } from 'src/common/dto/req.dto';
 import { CreateVideoReqDto, FindVideoReqDto } from './dto/req.dto';
@@ -15,6 +15,7 @@ import { CreateVideoResDto, FindVideoResDto } from './dto/res.dto';
 import { FindVideosQuery } from './query/find-videos.query';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PageResDto } from 'src/common/dto/res.dto';
+import { Response } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('Video')
@@ -75,9 +76,31 @@ export class VideoController {
         });
     }
 
+    @ApiGetResponse(FindVideoResDto)
     @Get(':id')
-    findOne(@Param() { id }: FindVideoReqDto) {
-        return this.videoService.findOne(id);
+    async findOne(@Param() { id }: FindVideoReqDto): Promise<FindVideoResDto> {
+        const { title, user } = await this.videoService.findOne(id);
+        return {
+            id,
+            title,
+            user: {
+                id: user.id,
+                email: user.email
+            }
+        }
     }
     
+    @Throttle({ default: {limit: 3, ttl: 60000}})
+    @Get(':id/download')
+    async download(
+        @Param() { id }: FindVideoReqDto,
+        @Res( { passthrough: true }) res: Response) {
+            const { stream, mimetype, size } = await this.videoService.download(id);
+            res.set({
+                'Content-Length': size,
+                'Content-Type': mimetype,
+                'Content-Disposition': 'attachment',
+            });
+            return new StreamableFile(stream);
+        }
 }
